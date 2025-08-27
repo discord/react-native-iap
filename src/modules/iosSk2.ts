@@ -6,6 +6,7 @@ import type {
   ProductSk2,
   ProductStatus,
   RefundRequestStatus,
+  StoreFrontInfo,
   TransactionSk2,
 } from '../types/appleSk2';
 
@@ -38,7 +39,8 @@ type finishTransaction = (transactionIdentifier: string) => Promise<boolean>;
 type getPendingTransactions = () => Promise<ProductPurchase[]>;
 type presentCodeRedemptionSheet = () => Promise<null>;
 type showManageSubscriptions = () => Promise<null>;
-type getStorefront = () => Promise<string>;
+
+type getStorefront = () => Promise<StoreFrontInfo>;
 
 export interface IosModulePropsSk2 extends NativeModuleProps {
   isAvailable(): number;

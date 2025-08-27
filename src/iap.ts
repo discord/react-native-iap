@@ -12,6 +12,7 @@ import {
   productSk2Map,
   subscriptionSk2Map,
   transactionSk2ToPurchaseMap,
+  StoreFrontInfo,
 } from './types/appleSk2';
 import {
   fillProductsWithAdditionalData,
@@ -965,11 +966,15 @@ export const deepLinkToSubscriptions = ({
  * };
  * ```
  */
-export const getStorefront = (): Promise<string> => {
+export const getStorefront = (): Promise<StoreFrontInfo> => {
   return (
     Platform.select({
       android: async () => {
-        return await RNIapModule.getStorefront();
+        const storefront = await RNIapModule.getStorefront();
+        return {
+          storefront,
+          currency: null
+        }
       },
       ios: async () => {
         return await RNIapIosSk2.getStorefront();

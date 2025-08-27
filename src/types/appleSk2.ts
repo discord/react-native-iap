@@ -247,3 +247,8 @@ export const offerSk2Map = (
     timestamp: offer.timestamp.toString(),
   };
 };
+
+export interface StoreFrontInfo {
+  storefront: string;
+  currency: string | null;
+}
