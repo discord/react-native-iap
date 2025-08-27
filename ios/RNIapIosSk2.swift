@@ -1079,10 +1079,15 @@ class RNIapIosSk2iOS15: Sk2Delegate {
 
     public func getStorefront(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
         Task {
-            let storefront = await Storefront.current
+            let storefront = await Storefront.current;
             // let currency = Storefront.currency;
             // resolve(storefront?.countryCode)
-            resolve(["storefront": storefront?.countryCode, "currency": storefront?.currency?.identifier])
+            if #available(iOS 17.0, tvOS 17.0, *) {
+                let currency = storefront?.currency;
+            } else {
+                let currency = "";
+            }
+            resolve(["storefront": storefront?.countryCode, "currency": currency])
         }
     }
 }
