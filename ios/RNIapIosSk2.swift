@@ -732,7 +732,7 @@ class RNIapIosSk2iOS15: Sk2Delegate {
                         let signature = withOffer["signature"]
                         let timestamp = withOffer["timestamp"]
 
-                        if let offerID = offerID, let keyID = keyID, let nonce = nonce, let nonce = UUID(uuidString: nonce), let signature = signature, let signature = signature.data(using: .utf8), let timestamp = timestamp, let timestamp = Int(timestamp) {
+                        if let offerID = offerID, let keyID = keyID, let nonce = nonce, let nonce = UUID(uuidString: nonce), let signature = signature, let signature = Data(base64Encoded: signature), let timestamp = timestamp, let timestamp = Int(timestamp) {
                             options.insert(.promotionalOffer(offerID: offerID, keyID: keyID, nonce: nonce, signature: signature, timestamp: timestamp ))
                         }
                     }
