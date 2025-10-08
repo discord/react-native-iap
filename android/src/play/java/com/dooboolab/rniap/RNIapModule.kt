@@ -461,7 +461,7 @@ class RNIapModule(
         isOfferPersonalized: Boolean, // New parameter in V5
         promise: Promise,
     ) {
-        val activity = currentActivity
+        val activity = reactContext.currentActivity
         if (activity == null) {
             promise.safeReject(PromiseUtils.E_UNKNOWN, "getCurrentActivity returned null")
             return
