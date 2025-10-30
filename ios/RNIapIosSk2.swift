@@ -34,6 +34,7 @@ protocol Sk2Delegate {
     func buyProduct(
         _ sku: String,
         requestJSONString: String?,
+        useACOM: Bool,
         andDangerouslyFinishTransactionAutomatically: Bool,
         appAccountToken: String?,
         quantity: Int,
@@ -157,6 +158,7 @@ class DummySk2: Sk2Delegate {
     func buyProduct(
         _ sku: String,
         requestJSONString: String?,
+        useACOM: Bool,
         andDangerouslyFinishTransactionAutomatically: Bool,
         appAccountToken: String?,
         quantity: Int,
@@ -333,6 +335,7 @@ class RNIapIosSk2: RCTEventEmitter, Sk2Delegate {
     @objc public func buyProduct(
         _ sku: String,
         requestJSONString: String?,
+        useACOM: Bool,
         andDangerouslyFinishTransactionAutomatically: Bool,
         appAccountToken: String?,
         quantity: Int,
@@ -343,6 +346,7 @@ class RNIapIosSk2: RCTEventEmitter, Sk2Delegate {
         delegate.buyProduct(
             sku,
             requestJSONString: requestJSONString,
+            useACOM: useACOM,
             andDangerouslyFinishTransactionAutomatically: andDangerouslyFinishTransactionAutomatically,
             appAccountToken: appAccountToken,
             quantity: quantity,
@@ -704,6 +708,7 @@ class RNIapIosSk2iOS15: Sk2Delegate {
     public func buyProduct(
         _ sku: String,
         requestJSONString: String?,
+        useACOM: Bool,
         andDangerouslyFinishTransactionAutomatically: Bool,
         appAccountToken: String?,
         quantity: Int,
@@ -720,7 +725,11 @@ class RNIapIosSk2iOS15: Sk2Delegate {
 
                     if let requestJSONString = requestJSONString {
                         let requestData = Data(requestJSONString.utf8)
-                        options.insert(Product.PurchaseOption.custom(key: "requestData", value: requestData))
+                        if useACOM {
+                            options.insert(Product.PurchaseOption.custom(key: "advancedCommerceData", value: requestData))
+                        } else {
+                            options.insert(Product.PurchaseOption.custom(key: "requestData", value: requestData))
+                        }
                     } else {
                         if quantity > -1 {
                             options.insert(.quantity(quantity))

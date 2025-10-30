@@ -231,6 +231,7 @@ export interface RequestPurchaseIOS {
   sku: Sku;
   andDangerouslyFinishTransactionAutomaticallyIOS?: boolean;
   requestJSONString?: string;
+  useACOM?: boolean;
   /**
    * UUID representing user account
    */
