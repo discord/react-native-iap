@@ -40,6 +40,7 @@ RCT_EXTERN_METHOD(getAvailableItems:
 RCT_EXTERN_METHOD(buyProduct:
                   (NSString*)sku
                   requestJSONString:(NSString*)requestJSONString
+                  useACOM:(BOOL)useACOM
                   andDangerouslyFinishTransactionAutomatically:(BOOL)andDangerouslyFinishTransactionAutomatically
                   appAccountToken:(NSString*)appAccountToken
                   quantity:(NSInteger)quantity

@@ -598,6 +598,7 @@ export const requestPurchase = (
           quantity,
           withOffer,
           requestJSONString,
+          useACOM,
         } = request;
 
         if (andDangerouslyFinishTransactionAutomaticallyIOS) {
@@ -612,6 +613,7 @@ export const requestPurchase = (
             await RNIapIosSk2.buyProduct(
               sku,
               requestJSONString,
+              useACOM === true,
               andDangerouslyFinishTransactionAutomaticallyIOS,
               appAccountToken,
               quantity ?? -1,
@@ -620,6 +622,9 @@ export const requestPurchase = (
           );
           return Promise.resolve(purchase);
         } else {
+          if (useACOM === true) {
+            throw new Error('ACOM cannot be used with storekit v1');
+          }
           return RNIapIos.buyProduct(
             sku,
             requestJSONString,
@@ -757,6 +762,7 @@ export const requestSubscription = (
           quantity,
           withOffer,
           requestJSONString,
+          useACOM,
         } = request;
 
         if (andDangerouslyFinishTransactionAutomaticallyIOS) {
@@ -772,6 +778,7 @@ export const requestSubscription = (
             await RNIapIosSk2.buyProduct(
               sku,
               requestJSONString,
+              useACOM === true,
               andDangerouslyFinishTransactionAutomaticallyIOS,
               appAccountToken,
               quantity ?? -1,
@@ -780,6 +787,9 @@ export const requestSubscription = (
           );
           return Promise.resolve(purchase);
         } else {
+          if (useACOM === true) {
+            throw new Error('ACOM cannot be used with storekit v1');
+          }
           return RNIapIos.buyProduct(
             sku,
             requestJSONString,
