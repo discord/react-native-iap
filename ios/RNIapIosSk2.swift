@@ -846,7 +846,7 @@ class RNIapIosSk2iOS15: Sk2Delegate {
 
                     reject(
                         IapErrors.E_UNKNOWN.rawValue,
-                        "Purchased failed for sku:\(sku): \(error.localizedDescription)",
+                        "Purchased failed for sku:\(sku): \(error.localizedDescription); error: \(error)",
                         error)
                 }
             } else {
