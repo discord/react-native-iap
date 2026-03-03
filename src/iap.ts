@@ -977,7 +977,7 @@ export const deepLinkToSubscriptions = ({
  */
 export const getStorefront = (): Promise<{
   countryCode: string;
-  currency?: string;
+  currency: string | null;
 } | null> => {
   return (
     Platform.select({
@@ -985,7 +985,7 @@ export const getStorefront = (): Promise<{
         const countryCode = await RNIapModule.getStorefront();
         return {
           countryCode,
-          currencyCode: null,
+          currency: null,
         };
       },
       ios: async () => {

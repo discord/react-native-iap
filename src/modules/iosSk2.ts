@@ -41,7 +41,7 @@ type presentCodeRedemptionSheet = () => Promise<null>;
 type showManageSubscriptions = () => Promise<null>;
 type getStorefront = () => Promise<{
   countryCode: string;
-  currency?: string;
+  currency: string | null;
 } | null>;
 
 export interface IosModulePropsSk2 extends NativeModuleProps {
