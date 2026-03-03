@@ -299,7 +299,7 @@ class RNIapIosSk2: RCTEventEmitter, Sk2Delegate {
      "purchase-updated", "purchase-error" are for backward compatibility
      */
     override func supportedEvents() -> [String]? {
-        return [ "purchase-updated", "purchase-error", "iap-transaction-updated"]
+        return [ "purchase-updated", "purchase-error", "iap-transaction-updated", "storefront-updated"]
     }
 
     @objc public func initConnection(
@@ -451,6 +451,7 @@ class RNIapIosSk2iOS15: Sk2Delegate {
     private let _hasListenersQueue = DispatchQueue(label: "com.dooboolab.rniap.hasListenersQueue", attributes: .concurrent)
     private var transactions: [String: Transaction]
     private var updateListenerTask: Task<Void, Error>?
+    private var storefrontListenerTask: Task<Void, Error>?
     fileprivate var sendEvent: ((String?, Any?) -> Void)?
     var hasListeners: Bool {
         get {
@@ -509,16 +510,31 @@ class RNIapIosSk2iOS15: Sk2Delegate {
         if updateListenerTask == nil {
             updateListenerTask = listenForTransactions()
         }
+        if storefrontListenerTask == nil {
+            storefrontListenerTask = listenForStorefrontChanges()
+        }
     }
 
     func removeTransactionObserver() {
         updateListenerTask?.cancel()
         updateListenerTask = nil
+        storefrontListenerTask?.cancel()
+        storefrontListenerTask = nil
     }
 
     func addTransaction(_ transaction: Transaction) {
         let transactionId = String(transaction.id)
         self.transactions[transactionId] = transaction
+    }
+
+    func listenForStorefrontChanges() -> Task<Void, Error> {
+        return Task.detached {
+            for await storefront in Storefront.updates {
+                if self.hasListeners {
+                    self.sendEvent?("storefront-updated", serialize(storefront))
+                }
+            }
+        }
     }
 
     func listenForTransactions() -> Task<Void, Error> {
@@ -1087,9 +1103,9 @@ class RNIapIosSk2iOS15: Sk2Delegate {
     }
 
     public func getStorefront(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-        Task {
+    Task {
             let storefront = await Storefront.current
-            resolve(storefront?.countryCode)
+            resolve(serialize(storefront))
         }
     }
 }

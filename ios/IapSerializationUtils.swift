@@ -245,3 +245,19 @@ func serialize(_ pt: Product.ProductType?) -> String? {
         return nil
     }
 }
+@available(iOS 15.0, tvOS 15.0, *)
+func serialize(_ s: Storefront?) -> [String: Any]? {
+    guard let s = s else {return nil}
+
+    var result: [String: Any] = [
+        "countryCode": s.countryCode,
+    ]
+
+    if #available(iOS 17.0, tvOS 17.0, *) {
+        result["currencyCode"] = s.currency?.identifier
+    } else {
+        result["currencyCode"] = nil
+    }
+
+    return result;
+}
