@@ -975,11 +975,18 @@ export const deepLinkToSubscriptions = ({
  * };
  * ```
  */
-export const getStorefront = (): Promise<string> => {
+export const getStorefront = (): Promise<{
+  countryCode: string;
+  currency: string | null;
+} | null> => {
   return (
     Platform.select({
       android: async () => {
-        return await RNIapModule.getStorefront();
+        const countryCode = await RNIapModule.getStorefront();
+        return {
+          countryCode,
+          currency: null,
+        };
       },
       ios: async () => {
         return await RNIapIosSk2.getStorefront();
