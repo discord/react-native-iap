@@ -449,7 +449,7 @@ class RNIapIosSk2: RCTEventEmitter, Sk2Delegate {
 class RNIapIosSk2iOS15: Sk2Delegate {
     private var _hasListeners = false
     private let _hasListenersQueue = DispatchQueue(label: "com.dooboolab.rniap.hasListenersQueue", attributes: .concurrent)
-    private var transactions: [String: Transaction]
+    private var transactions: ThreadSafe<[String: Transaction]>
     private var updateListenerTask: Task<Void, Error>?
     private var storefrontListenerTask: Task<Void, Error>?
     fileprivate var sendEvent: ((String?, Any?) -> Void)?
@@ -465,7 +465,7 @@ class RNIapIosSk2iOS15: Sk2Delegate {
     }
     init(sendEvent: ((String?, Any?) -> Void)? ) {
         self.sendEvent = sendEvent
-        transactions = [String: Transaction]()
+        transactions = ThreadSafe<[String: Transaction]>([:])
     }
 
     deinit {
@@ -524,7 +524,7 @@ class RNIapIosSk2iOS15: Sk2Delegate {
 
     func addTransaction(_ transaction: Transaction) {
         let transactionId = String(transaction.id)
-        self.transactions[transactionId] = transaction
+        self.transactions.atomically { $0[transactionId] = transaction }
     }
 
     func listenForStorefrontChanges() -> Task<Void, Error> {
@@ -597,7 +597,7 @@ class RNIapIosSk2iOS15: Sk2Delegate {
         Task {
             await productStore.removeAll()
         }
-        transactions.removeAll()
+        transactions.atomically { $0.removeAll() }
         removeTransactionObserver()
         resolve(nil)
     }
@@ -962,11 +962,11 @@ class RNIapIosSk2iOS15: Sk2Delegate {
         reject: @escaping RCTPromiseRejectBlock = { _, _, _ in }
     ) {
         Task {
-            if let transaction = transactions[transactionIdentifier] {
+            if let transaction = transactions.value[transactionIdentifier] {
                 debugMessage("Finishing transaction")
                 await transaction.finish()
                 debugMessage("Finished transaction")
-                transactions.removeValue(forKey: transactionIdentifier)
+                transactions.atomically { $0.removeValue(forKey: transactionIdentifier) }
                 resolve(nil)
             } else {
                 reject(IapErrors.E_DEVELOPER_ERROR.rawValue, "Invalid transaction Id", nil)
@@ -978,7 +978,7 @@ class RNIapIosSk2iOS15: Sk2Delegate {
         _ resolve: @escaping RCTPromiseResolveBlock = { _ in },
         reject: @escaping RCTPromiseRejectBlock = { _, _, _ in }
     ) {
-        resolve(transactions.values.map({(t: Transaction) in serialize(t)}))
+        resolve(transactions.value.values.map({(t: Transaction) in serialize(t)}))
     }
 
     public func sync(
@@ -1048,7 +1048,7 @@ class RNIapIosSk2iOS15: Sk2Delegate {
                     debugMessage("Finishing transaction")
                     await transaction.finish()
                     debugMessage("Finished transaction")
-                    transactions.removeValue(forKey: String(transaction.id))
+                    transactions.atomically { $0.removeValue(forKey: String(transaction.id)) }
                 } catch {
                     debugMessage("Failed to finish transaction")
                 }
